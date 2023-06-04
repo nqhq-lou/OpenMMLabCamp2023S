@@ -1,7 +1,7 @@
 # files
 mmpose/checkpoint
 mmpose/data
-
+*.pth
 
 # folders
 src_code/mmdetection/
