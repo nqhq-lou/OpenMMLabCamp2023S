@@ -1,0 +1,10 @@
+# files
+mmpose/checkpoint
+mmpose/data
+
+
+# folders
+src_code/mmdetection/
+src_code/mmpose/
+src_code/mmpretrain/
+src_code/mmsegmentation/
