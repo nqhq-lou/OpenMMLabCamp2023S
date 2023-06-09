@@ -10,3 +10,8 @@
     - [MMPose.ipynb](./mmpose/hw/MMPose_RTMPose.ipynb)
 
 
+## HW3: MMPretrain
+
+- [HW requirements](https://github.com/open-mmlab/OpenMMLabCamp/issues/111)
+- [HW: MMPose](./mmpretrain)
+- [HW: README](./mmpretrain/README.md)
