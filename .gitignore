@@ -1,7 +1,9 @@
 # files
+*.pth
 mmpose/checkpoint
 mmpose/data
-*.pth
+mmpretrain/data/fruit30_dataset
+
 
 # folders
 src_code/mmdetection/

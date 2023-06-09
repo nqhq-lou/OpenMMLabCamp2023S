@@ -1,0 +1,1 @@
+/home/louzekun/projects/mmlab/src_code/mmpretrain/demo/image_demo.py
