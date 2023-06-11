@@ -4,7 +4,6 @@ mmpose/checkpoint
 mmpose/data
 mmpretrain/data/fruit30_dataset
 
-
 # folders
 src_code/mmdetection/
 src_code/mmpose/
