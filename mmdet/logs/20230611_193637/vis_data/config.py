@@ -18,7 +18,7 @@ visualizer = dict(
     name='visualizer')
 log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 log_level = 'INFO'
-load_from = './logs/best_coco_bbox_mAP_epoch_90.pth'
+load_from = 'https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet_tiny_8xb32-300e_coco/rtmdet_tiny_8xb32-300e_coco_20220902_112414-78e30dcc.pth'
 resume = False
 train_cfg = dict(
     type='EpochBasedTrainLoop',
@@ -85,9 +85,11 @@ test_pipeline = [
                    'scale_factor'))
 ]
 train_dataloader = dict(
+    pin_memory=False,
+    persistent_workers=True,
+    collate_fn=dict(type='default_collate'),
     batch_size=16,
     num_workers=8,
-    persistent_workers=True,
     sampler=dict(type='DefaultSampler', shuffle=True),
     batch_sampler=None,
     dataset=dict(
@@ -127,12 +129,13 @@ train_dataloader = dict(
             dict(type='PackDetInputs')
         ],
         backend_args=None,
-        metainfo=dict(classes=('balloon', ), palette=[(220, 20, 60)])),
-    pin_memory=False)
+        metainfo=dict(classes=('balloon', ), palette=[(220, 20, 60)])))
 val_dataloader = dict(
+    pin_memory=True,
+    persistent_workers=True,
+    collate_fn=dict(type='default_collate'),
     batch_size=12,
     num_workers=4,
-    persistent_workers=True,
     drop_last=False,
     sampler=dict(type='DefaultSampler', shuffle=False),
     dataset=dict(
@@ -156,10 +159,10 @@ val_dataloader = dict(
         metainfo=dict(classes=('balloon', ), palette=[(220, 20, 60)])))
 test_dataloader = dict(
     pin_memory=True,
+    persistent_workers=True,
     collate_fn=dict(type='default_collate'),
     batch_size=12,
     num_workers=4,
-    persistent_workers=True,
     drop_last=False,
     sampler=dict(type='DefaultSampler', shuffle=False),
     dataset=dict(

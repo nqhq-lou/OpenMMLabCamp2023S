@@ -18,7 +18,7 @@ visualizer = dict(
     name='visualizer')
 log_processor = dict(type='LogProcessor', window_size=50, by_epoch=True)
 log_level = 'INFO'
-load_from = './logs/best_coco_bbox_mAP_epoch_90.pth'
+load_from = 'https://download.openmmlab.com/mmdetection/v3.0/rtmdet/rtmdet_tiny_8xb32-300e_coco/rtmdet_tiny_8xb32-300e_coco_20220902_112414-78e30dcc.pth'
 resume = False
 train_cfg = dict(
     type='EpochBasedTrainLoop',
@@ -31,7 +31,7 @@ param_scheduler = [
     dict(type='LinearLR', start_factor=1e-05, by_epoch=False, begin=0, end=30),
     dict(
         type='CosineAnnealingLR',
-        eta_min=1.25e-05,
+        eta_min=0.0001,
         begin=100,
         end=200,
         T_max=100,
@@ -40,12 +40,12 @@ param_scheduler = [
 ]
 optim_wrapper = dict(
     type='OptimWrapper',
-    optimizer=dict(type='AdamW', lr=0.00025, weight_decay=0.05),
+    optimizer=dict(type='AdamW', lr=0.002, weight_decay=0.05),
     paramwise_cfg=dict(
         norm_decay_mult=0, bias_decay_mult=0, bypass_duplicate=True))
 auto_scale_lr = dict(enable=False, base_batch_size=16)
 dataset_type = 'CocoDataset'
-data_root = './data/balloon/'
+data_root = './data/Drink_coco/'
 backend_args = None
 train_pipeline = [
     dict(type='LoadImageFromFile', backend_args=None),
@@ -85,16 +85,18 @@ test_pipeline = [
                    'scale_factor'))
 ]
 train_dataloader = dict(
-    batch_size=16,
-    num_workers=8,
+    pin_memory=False,
     persistent_workers=True,
+    collate_fn=dict(type='default_collate'),
+    batch_size=64,
+    num_workers=8,
     sampler=dict(type='DefaultSampler', shuffle=True),
     batch_sampler=None,
     dataset=dict(
         type='CocoDataset',
-        data_root='./data/balloon/',
-        ann_file='train/balloon_train.json',
-        data_prefix=dict(img='train/'),
+        data_root='./data/Drink_coco/',
+        ann_file='train_coco.json',
+        data_prefix=dict(img='images/'),
         filter_cfg=dict(filter_empty_gt=True, min_size=32),
         pipeline=[
             dict(type='LoadImageFromFile', backend_args=None),
@@ -127,19 +129,23 @@ train_dataloader = dict(
             dict(type='PackDetInputs')
         ],
         backend_args=None,
-        metainfo=dict(classes=('balloon', ), palette=[(220, 20, 60)])),
-    pin_memory=False)
+        metainfo=dict(
+            classes=('cola', 'pepsi', 'sprite', 'fanta', 'spring', 'ice',
+                     'scream', 'milk', 'red', 'king'),
+            palette=[(220, 20, 60)])))
 val_dataloader = dict(
-    batch_size=12,
-    num_workers=4,
+    pin_memory=True,
     persistent_workers=True,
+    collate_fn=dict(type='default_collate'),
+    batch_size=32,
+    num_workers=8,
     drop_last=False,
     sampler=dict(type='DefaultSampler', shuffle=False),
     dataset=dict(
         type='CocoDataset',
-        data_root='./data/balloon/',
-        ann_file='val/balloon_val.json',
-        data_prefix=dict(img='val/'),
+        data_root='./data/Drink_coco/',
+        ann_file='val_coco.json',
+        data_prefix=dict(img='images/'),
         test_mode=True,
         pipeline=[
             dict(type='LoadImageFromFile', backend_args=None),
@@ -153,20 +159,23 @@ val_dataloader = dict(
                            'scale_factor'))
         ],
         backend_args=None,
-        metainfo=dict(classes=('balloon', ), palette=[(220, 20, 60)])))
+        metainfo=dict(
+            classes=('cola', 'pepsi', 'sprite', 'fanta', 'spring', 'ice',
+                     'scream', 'milk', 'red', 'king'),
+            palette=[(220, 20, 60)])))
 test_dataloader = dict(
     pin_memory=True,
-    collate_fn=dict(type='default_collate'),
-    batch_size=12,
-    num_workers=4,
     persistent_workers=True,
+    collate_fn=dict(type='default_collate'),
+    batch_size=32,
+    num_workers=8,
     drop_last=False,
     sampler=dict(type='DefaultSampler', shuffle=False),
     dataset=dict(
         type='CocoDataset',
-        data_root='./data/balloon/',
-        ann_file='val/balloon_val.json',
-        data_prefix=dict(img='val/'),
+        data_root='./data/Drink_coco/',
+        ann_file='val_coco.json',
+        data_prefix=dict(img='images/'),
         test_mode=True,
         pipeline=[
             dict(type='LoadImageFromFile', backend_args=None),
@@ -180,17 +189,20 @@ test_dataloader = dict(
                            'scale_factor'))
         ],
         backend_args=None,
-        metainfo=dict(classes=('balloon', ), palette=[(220, 20, 60)])))
+        metainfo=dict(
+            classes=('cola', 'pepsi', 'sprite', 'fanta', 'spring', 'ice',
+                     'scream', 'milk', 'red', 'king'),
+            palette=[(220, 20, 60)])))
 val_evaluator = dict(
     type='CocoMetric',
-    ann_file='./data/balloon/./val/balloon_val.json',
+    ann_file='./data/Drink_coco/val_coco.json',
     metric='bbox',
     format_only=False,
     backend_args=None,
     proposal_nums=(100, 1, 10))
 test_evaluator = dict(
     type='CocoMetric',
-    ann_file='./data/balloon/./val/balloon_val.json',
+    ann_file='./data/Drink_coco/val_coco.json',
     metric='bbox',
     format_only=False,
     backend_args=None,
@@ -272,7 +284,7 @@ model = dict(
         act_cfg=dict(type='SiLU', inplace=True)),
     bbox_head=dict(
         type='RTMDetSepBNHead',
-        num_classes=1,
+        num_classes=10,
         in_channels=96,
         stacked_convs=2,
         feat_channels=96,
@@ -318,7 +330,7 @@ train_pipeline_stage2 = [
 ]
 max_epochs = 200
 stage2_num_epochs = 20
-base_lr = 0.00025
+base_lr = 0.002
 interval = 10
 custom_hooks = [
     dict(
@@ -348,12 +360,15 @@ custom_hooks = [
         ])
 ]
 checkpoint = 'https://download.openmmlab.com/mmdetection/v3.0/rtmdet/cspnext_rsb_pretrain/cspnext-tiny_imagenet_600e.pth'
-metainfo = dict(classes=('balloon', ), palette=[(220, 20, 60)])
-num_classes = 1
-train_batch_size_per_gpu = 16
+metainfo = dict(
+    classes=('cola', 'pepsi', 'sprite', 'fanta', 'spring', 'ice', 'scream',
+             'milk', 'red', 'king'),
+    palette=[(220, 20, 60)])
+num_classes = 10
+train_batch_size_per_gpu = 64
 train_num_workers = 8
-val_batch_size_per_gpu = 12
-val_num_workers = 4
+val_batch_size_per_gpu = 32
+val_num_workers = 8
 num_epochs_stage2 = 5
 launcher = 'none'
-work_dir = './logs'
+work_dir = './logs_drink'

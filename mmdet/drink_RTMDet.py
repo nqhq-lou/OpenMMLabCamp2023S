@@ -5,27 +5,27 @@
 _base_ = "./configs/rtmdet/rtmdet_tiny_8xb32-300e_coco.py"
 
 # data_root = "."
-data_root = "./data/balloon/"
+data_root = "./data/Drink_coco/"
 
 
 # in reference to https://github.com/CrabBoss-lab/openmmlab-Camp/blob/master/03-mmdetection-task/mmdetection/balloon_dataset/balloon_rtmdet.py
 # just copy his work hehe
 metainfo = dict(
-    classes=('balloon', ),
+    classes=('cola', 'pepsi', 'sprite', 'fanta', 'spring', 'ice', 'scream', 'milk', 'red', 'king'),
     palette=[(220,20,60),]
 )
-num_classes = 1
+num_classes = len(metainfo['classes'])
 
 max_epochs = 200
-train_batch_size_per_gpu = 16
-train_num_workers = train_batch_size_per_gpu // 2
+train_batch_size_per_gpu = 64
+train_num_workers = 8
 
-val_batch_size_per_gpu = 12
-val_num_workers = train_num_workers // 2
+val_batch_size_per_gpu = 32
+val_num_workers = 8
 
 # RTMDet consists of 2 training stage
 num_epochs_stage2 = 5
-base_lr = 0.004 * train_batch_size_per_gpu / (32*8)
+base_lr = 0.002
 
 # pretrain weights
 # you can find this ./mmdet/configs/rtmdet/metafile.yml
@@ -44,8 +44,8 @@ train_dataloader = dict(
     dataset=dict(
         data_root=data_root,
         metainfo=metainfo,
-        ann_file='train/balloon_train.json',
-        data_prefix=dict(img='train/'),
+        ann_file='train_coco.json',
+        data_prefix=dict(img='images/'),
     ),
 )
 
@@ -56,8 +56,8 @@ val_dataloader = dict(
     dataset=dict(
         data_root=data_root,
         metainfo=metainfo,
-        ann_file='val/balloon_val.json',
-        data_prefix=dict(img='val/'),
+        ann_file='val_coco.json',
+        data_prefix=dict(img='images/'),
     ),
 )
 
@@ -97,7 +97,7 @@ optim_wrapper = dict(optimizer=dict(lr=base_lr))
 
 _base_.custom_hooks[1].switch_epoch = max_epochs - num_epochs_stage2
 
-val_evaluator = dict(ann_file=data_root + './val/balloon_val.json')
+val_evaluator = dict(ann_file=data_root + 'val_coco.json')
 test_evaluator = val_evaluator
 
 
